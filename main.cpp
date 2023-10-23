@@ -2,19 +2,16 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <ctime>
+#include <iostream>
 #include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
 #include <unistd.h> // for STDOUT_FILENO
 // ...
 
 using namespace std;
 
-struct Question {
-    string text;
-    string ans[4];
-    unsigned char rightAns;
-    unsigned char diffNum;
 
-};
+
 
 struct Player {
     string name;
@@ -28,6 +25,27 @@ struct Player {
 };
 
 Player p;
+
+struct Question {
+    string text;
+    string ans[4];
+    unsigned char rightAns;
+    unsigned char diffNum;
+
+
+};
+
+Question qu;
+
+void drawQuestion(){
+    cout << "Игрок: " << p.name << "  Осталось жизней: " << p.HP << endl;
+    cout << "Сложность: " << qu.diffNum << endl << endl;
+    cout << qu.text << endl << endl;
+    cout << "[1] " << qu.ans[0] << endl;
+    cout << "[2] " << qu.ans[1] << endl;
+    cout << "[3] " << qu.ans[2] << endl;
+    cout << "[4] " << qu.ans[3] << endl;
+}
 
 void drawMenu(){
     cout << "[*] Программистическая викторина!!!\n\n"
@@ -51,7 +69,7 @@ void drawSettings(){
 }
 
 void drawArrow(string &ch){
-    cout << "->"; cin >> ch;
+    cout << "-> "; cin >> ch;
 }
 
 map<int, char> difficulty {
@@ -67,31 +85,36 @@ void startGame(){
 
 int main (){
 
+    unsigned int nQuestions;
+
     p.name = "";
     p.HP = 0;
     p.score = 0;
     p.gameLength = 10;
-    unsigned int nQuestions;
 
-    Question questions[] {
+
+    vector<Question> questions = {
             {"fffff",
-                    "123", "2345", "2346", "476",
-                    3, 1
+             "123", "2345", "2346", "476",
+             3, 1
             },
             {"fffff",
-                    "123", "2345", "2346", "476",
-                    3, 1
+             "123", "2345", "2346", "476",
+             0, 1
             },
             {"fffff",
-                    "123", "2345", "2346", "476",
-                    3, 1
+             "123", "2345", "2346", "476",
+             2, 1
             },
             {"fffff",
-                    "123", "2345", "2346", "476",
-                    3, 1
-            },
+               "123", "2345", "2346", "476",
+               1, 1
+            }
     };
-    nQuestions = sizeof(questions);
+    nQuestions = questions.size();
+
+    srand(time(nullptr));
+    unsigned int random = rand() % nQuestions;
 
     while (true) {
         drawMenu();
@@ -102,8 +125,13 @@ int main (){
             case '1':
                 if (p.name == "") {
                     p.enterName();
+                    startGame();
+
                 }
-                cout << "Игра началась.";
+                cout << "Игра началась.\n";
+
+
+
                 break;
             case '2':
                 cout << "Rules";
