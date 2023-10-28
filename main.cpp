@@ -8,6 +8,8 @@
 #include <unistd.h> // for STDOUT_FILENO
 // ...
 
+#define YEL "\x1b[33m"
+
 using namespace std;
 
 
@@ -26,26 +28,49 @@ struct Player {
 
 Player p;
 
+//map<int, char> difficulty {
+//        { 1, 'C' },
+//        { 2, 'B' },
+//        { 3, 'A' }
+//};
+
 struct Question {
     string text;
     string ans[4];
     unsigned char rightAns;
-    unsigned char diffNum;
+    unsigned int diffNum;
 
+    void drawQuestion(){
+        cout << "Игрок: " << p.name << "  Осталось жизней: " << p.HP << endl;
+        cout << "Счёт: " << p.score << endl;
+        cout << "Сложность: " << diffNum << endl << endl;
+        cout << text << endl << endl;
+        cout << "[1] " << ans[0] << endl;
+        cout << "[2] " << ans[1] << endl;
+        cout << "[3] " << ans[2] << endl;
+        cout << "[4] " << ans[3] << endl;
+    }
+
+    bool checkPAns(string answer) {
+        if (answer[0] == rightAns){
+            cout << "Правильно! вы получаете " << diffNum*10 << " очков\n";
+            p.score = p.score + diffNum*10;
+            return true;
+        } else {
+            cout << "Неправильно! вы теряете одну жизнь!\n\n";
+            p.HP--;
+            return false;
+        }
+    }
 
 };
 
-Question qu;
+Question qu {"fffff",
+             "123", "2345", "2346", "476",
+             '3', 2
+};
 
-void drawQuestion(){
-    cout << "Игрок: " << p.name << "  Осталось жизней: " << p.HP << endl;
-    cout << "Сложность: " << qu.diffNum << endl << endl;
-    cout << qu.text << endl << endl;
-    cout << "[1] " << qu.ans[0] << endl;
-    cout << "[2] " << qu.ans[1] << endl;
-    cout << "[3] " << qu.ans[2] << endl;
-    cout << "[4] " << qu.ans[3] << endl;
-}
+
 
 void drawMenu(){
     cout << "[*] Программистическая викторина!!!\n\n"
@@ -72,15 +97,14 @@ void drawArrow(string &ch){
     cout << "-> "; cin >> ch;
 }
 
-map<int, char> difficulty {
-        { 1, 'C' }, { 2, 'B' }, { 3, 'A' }
-};
+
 
 
 
 void startGame(){
     p.HP = 3;
     p.score = 0;
+    cout << "Игра началась.\n";
 }
 
 int main (){
@@ -93,25 +117,25 @@ int main (){
     p.gameLength = 10;
 
 
-    vector<Question> questions = {
+    vector<Question> ques = {
             {"fffff",
              "123", "2345", "2346", "476",
-             3, 1
+             '3', 1
             },
             {"fffff",
              "123", "2345", "2346", "476",
-             0, 1
+             '0', 1
             },
             {"fffff",
              "123", "2345", "2346", "476",
-             2, 1
+             '2', 1
             },
             {"fffff",
                "123", "2345", "2346", "476",
-               1, 1
+               '1', 1
             }
     };
-    nQuestions = questions.size();
+    nQuestions = ques.size();
 
     srand(time(nullptr));
     unsigned int random = rand() % nQuestions;
@@ -128,7 +152,22 @@ int main (){
                     startGame();
 
                 }
-                cout << "Игра началась.\n";
+
+
+                while (true){
+
+                    if(p.HP == 0){
+                        cout << "Вы проиграли!\n\n";
+                        return false;
+                    }
+
+                    qu.drawQuestion();
+                    string pAns;
+                    drawArrow(pAns);
+
+                    qu.checkPAns(pAns);
+
+                }
 
 
 
@@ -137,7 +176,8 @@ int main (){
                 cout << "Rules";
                 break;
             case '3':
-
+                drawSettings();
+                break;
             case '4':
                 return 0;
         }
